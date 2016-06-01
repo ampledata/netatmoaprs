@@ -9,7 +9,7 @@ Source:: https://github.com/ampledata/netatmoaprs
 
 
 __title__ = 'netatmoaprs'
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 __author__ = 'Greg Albrecht W2GMD <gba@orionlabs.io>'
 __license__ = 'Apache License, Version 2.0'
 __copyright__ = 'Copyright 2016 Orion Labs, Inc.'
@@ -41,17 +41,7 @@ setuptools.setup(
     license=open('LICENSE').read(),
     long_description=open('README.rst').read(),
     url='https://github.com/ampledata/netatmoaprs',
-    setup_requires=[
-      'coverage >= 3.7.1',
-      'httpretty >= 0.8.10',
-      'nose >= 1.3.7'
-    ],
-    install_requires=[
-        'kiss >= 2.0.2',
-        'pynmea2 >= 1.4.2',
-        'pyserial >= 2.7',
-        'requests >= 2.7.0'
-    ],
+    install_requires=['aprs'],
     package_dir={'netatmoaprs': 'netatmoaprs'},
     zip_safe=False,
     include_package_data=True,

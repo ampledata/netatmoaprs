@@ -14,7 +14,8 @@ __license__ = 'Apache License, Version 2.0'
 __copyright__ = 'Copyright 2016 Orion Labs, Inc.'
 
 
-def get_weather(device_id, client_id, client_secret, username, password):
+def get_weather(device_id, client_id, client_secret, username, password,
+                station_id=None):
     weather = {}
     weather['wind_direction'] = '...'
     weather['wind_speed'] = '...'
@@ -26,32 +27,38 @@ def get_weather(device_id, client_id, client_secret, username, password):
     weather['humidity'] = '..'
     weather['pressure'] = '.....'
 
-    #device_id = '70:ee:50:03:98:4c'  # Orion
-    #device_id = '70:ee:50:02:be:74'  # Home
-
     authorization = lnetatmo.ClientAuth(
         client_id, client_secret, username, password)
 
     device_list = lnetatmo.DeviceList(authorization)
     if not device_id in device_list.stations:
         return
+
     device_data = device_list.stations[device_id]
-    dashboard_data = device_data['dashboard_data']
     place_data = device_data['place']
 
+    # Select between Station ('Indoor' v 'Outdoor') and Dashboard Data.
+    if station_id is not None:
+        readings = device_list.lastData()[station_id]
+        last_reading = readings['When']
+    else:
+        readings = device_data['dashboard_data']
+        last_reading = readings['time_utc']
+
+
     # Humidity is an acceptable format for APRS:
-    weather['humidity'] = dashboard_data['Humidity']
+    weather['humidity'] = readings['Humidity']
 
     # Convert C to F for APRS:
-    weather['temperature'] = netatmoaprs.c2f(dashboard_data['Temperature'])
+    weather['temperature'] = netatmoaprs.c2f(readings['Temperature'])
 
     # Convert float to APRS format:
-    if 'Pressure' in dashboard_data:
-        weather['pressure'] = str(dashboard_data['Pressure']).replace('.', '')
+    if 'Pressure' in readings:
+        weather['pressure'] = str(readings['Pressure']).replace('.', '')
 
     # Convert UTC Epoch to DHM Zulu:
     weather['timestamp'] = time.strftime(
-        '%d%H%M', time.gmtime(dashboard_data['time_utc']))
+        '%d%H%M', time.gmtime(last_reading))
 
     # Get location data and convert to APRS format:
     weather['latitude'] = aprs.geo_util.dec2dm_lat(place_data['location'][1])

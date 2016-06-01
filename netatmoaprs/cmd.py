@@ -50,6 +50,10 @@ def cli():
         '-P', '--netatmo_password',
         help='Netatmo API Password', required=True
     )
+    parser.add_argument(
+        '-I', '--station_id',
+        help='Netatmo Station ID', default=None
+    )
 
     opts = parser.parse_args()
 
@@ -64,6 +68,7 @@ def cli():
         opts.client_id,
         opts.client_secret,
         opts.netatmo_username,
-        opts.netatmo_password
+        opts.netatmo_password,
+        station_id=opts.station_id
     )
     aprs_i.send("%s>APRS:%s" % (src_callsign, weather_frame))
